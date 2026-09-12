@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "data-vis-backend"
+version = "1.0.0-rc"
+description = "Analytical compute engine & SQLite persistence service for data-vis"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.111.0",
+    "uvicorn[standard]>=0.29.0",
+    "polars>=0.20.0",
+    "pyarrow>=16.0.0",
+    "aiosqlite>=0.20.0",
+    "pydantic>=2.7.0",
+    "python-multipart>=0.0.9",
+    "defusedxml>=0.7.1",
+    "lxml>=5.2.0",
+    "openpyxl>=3.1.2",
+    "fastexcel>=0.10.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.1.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=5.0.0",
+    "httpx>=0.27.0",
+    "ruff>=0.4.0",
+    "mypy>=1.9.0"
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "PL"]
+ignore = ["E501", "PLR"]
+
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["."]
+

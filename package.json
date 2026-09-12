@@ -1,0 +1,18 @@
+{
+  "name": "data-vis-monorepo",
+  "version": "1.0.0-rc",
+  "private": true,
+  "description": "Local-first data visualization and exploratory analysis workbench",
+  "license": "AGPL-3.0",
+  "scripts": {
+    "dev": "pnpm --filter @data-vis/desktop dev",
+    "tauri": "pnpm --filter @data-vis/desktop tauri",
+    "build": "pnpm --filter @data-vis/desktop build",
+    "test": "pnpm --filter @data-vis/desktop test",
+    "lint": "pnpm --filter @data-vis/desktop lint",
+    "typecheck": "pnpm --filter @data-vis/desktop typecheck"
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5"
+  }
+}

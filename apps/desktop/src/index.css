@@ -1,0 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Editorial Typographic Tokens */
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-reading: 'Source Serif 4', Georgia, Cambria, 'Times New Roman', Times, serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', Menia, Consolas, monospace;
+
+  /* Layout Tokens */
+  --reading-width: 768px;
+  --sidebar-width: 260px;
+
+  /* Warm Neutral Palette -- Light Theme (Parchment & Warm Off-White) */
+  --bg-app: #fbf9f5;
+  --bg-surface: #f4f0e8;
+  --bg-subtle: #eae5db;
+  --bg-elevated: #ffffff;
+
+  --text-primary: #1c1917;
+  --text-secondary: #57524a;
+  --text-muted: #8c857b;
+
+  --border-subtle: #e4decb;
+  --border-strong: #d1c8b4;
+
+  --color-accent: #b45309;
+  --color-accent-hover: #92400e;
+  --color-accent-subtle: #fef3c7;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+
+  /* Graph Surface Tokens -- Light Theme (Parchment & Warm Slate Grid) */
+  --graph-bg: #F4F0E8;
+  --graph-grid: #D6CFC2;
+}
+
+.dark {
+  /* Warm Neutral Palette -- Dark Theme (Charcoal & Warm Obsidian) */
+  --bg-app: #121110;
+  --bg-surface: #1a1816;
+  --bg-subtle: #24211e;
+  --bg-elevated: #2e2b27;
+
+  --text-primary: #f5f2eb;
+  --text-secondary: #b5ad9e;
+  --text-muted: #787166;
+
+  --border-subtle: #2d2925;
+  --border-strong: #423d37;
+
+  --color-accent: #d97706;
+  --color-accent-hover: #f59e0b;
+  --color-accent-subtle: #451a03;
+
+  /* Graph Surface Tokens -- Dark Theme (Soft Black & Warm Charcoal Grid) */
+  --graph-bg: #181816;
+  --graph-grid: #34332F;
+}
+
+/* Base resets & Editorial Typography */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-ui);
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Editorial Content / Reading Prose Styling */
+.font-reading {
+  font-family: var(--font-reading);
+}
+
+.font-ui {
+  font-family: var(--font-ui);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* React Resizable Grid Handle */
+.react-resizable-handle {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  bottom: 0;
+  right: 0;
+  cursor: se-resize;
+}
+
+.react-resizable-handle::after {
+  content: "";
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid var(--text-muted);
+  border-bottom: 2px solid var(--text-muted);
+  opacity: 0.5;
+}

@@ -1,3 +1,4 @@
+import re
 import time
 from typing import Any
 
@@ -18,7 +19,6 @@ class QueryCompiler:
         # 1. Apply Global Search Term (across all columns)
         search_term = query_dto.get("search_term")
         if search_term and str(search_term).strip():
-            import re
             escaped_term = re.escape(str(search_term).strip())
             cols = df_plan.collect_schema().names()
             or_exprs = [pl.col(c).cast(pl.Utf8).str.contains(f"(?i){escaped_term}") for c in cols]
@@ -41,12 +41,11 @@ class QueryCompiler:
         # Explode multi-valued list dimensions on the fly
         if query_dto.get("explode_dimension") and group_by:
             for dim in group_by:
-                df_plan = df_plan.with_columns(
-                    pl.col(dim).cast(pl.String).str.split(",")
-                ).explode(dim).with_columns(
-                    pl.col(dim).str.strip_chars()
-                ).filter(
-                    pl.col(dim).is_not_null() & (pl.col(dim) != "")
+                df_plan = (
+                    df_plan.with_columns(pl.col(dim).cast(pl.String).str.split(","))
+                    .explode(dim)
+                    .with_columns(pl.col(dim).str.strip_chars())
+                    .filter(pl.col(dim).is_not_null() & (pl.col(dim) != ""))
                 )
 
         if group_by or aggregations:
@@ -64,7 +63,6 @@ class QueryCompiler:
         # 4. Apply Sort
         sort_rules = query_dto.get("sort", [])
         if sort_rules:
-            import re
             by_exprs = []
             desc_list = []
 
@@ -80,20 +78,29 @@ class QueryCompiler:
                     col_name = agg_alias_map[col_name]
                 elif aggregations:
                     # If col_name matches any aggregation alias suffix
-                    matched = next((a.get("alias") for a in aggregations if a.get("alias", "").endswith(col_name)), None)
+                    matched = next(
+                        (
+                            a.get("alias")
+                            for a in aggregations
+                            if a.get("alias", "").endswith(col_name)
+                        ),
+                        None,
+                    )
                     if matched:
                         col_name = matched
 
                 if col_name:
                     if re.search(r"(date|created_at|updated_at|timestamp|dob)", col_name.lower()):
-                        date_expr = pl.coalesce([
-                            pl.col(col_name).str.to_date("%B %d, %Y", strict=False),
-                            pl.col(col_name).str.to_date("%m/%d/%Y", strict=False),
-                            pl.col(col_name).str.to_date("%d/%m/%Y", strict=False),
-                            pl.col(col_name).str.to_date("%Y-%m-%d", strict=False),
-                            pl.col(col_name).cast(pl.Date, strict=False),
-                            pl.col(col_name)
-                        ])
+                        date_expr = pl.coalesce(
+                            [
+                                pl.col(col_name).str.to_date("%B %d, %Y", strict=False),
+                                pl.col(col_name).str.to_date("%m/%d/%Y", strict=False),
+                                pl.col(col_name).str.to_date("%d/%m/%Y", strict=False),
+                                pl.col(col_name).str.to_date("%Y-%m-%d", strict=False),
+                                pl.col(col_name).cast(pl.Date, strict=False),
+                                pl.col(col_name),
+                            ]
+                        )
                         by_exprs.append(date_expr)
                     else:
                         by_exprs.append(pl.col(col_name))

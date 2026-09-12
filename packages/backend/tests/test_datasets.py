@@ -1,6 +1,7 @@
 import os
 import tempfile
 import unittest
+
 from fastapi.testclient import TestClient
 
 from db.connection import init_db
@@ -42,7 +43,11 @@ class TestDatasetsRouter(unittest.IsolatedAsyncioTestCase):
             f"/api/v1/datasets/{ds_id}/columns",
             json={
                 "columns": [
-                    {"original_name": "Salary", "custom_alias": "Annual Compensation", "data_type": "Int64"}
+                    {
+                        "original_name": "Salary",
+                        "custom_alias": "Annual Compensation",
+                        "data_type": "Int64",
+                    }
                 ]
             },
         )

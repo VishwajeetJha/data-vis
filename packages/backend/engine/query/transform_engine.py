@@ -1,10 +1,14 @@
+import re
 from typing import Any
+
 import polars as pl
 
 
 class TransformEngine:
     @classmethod
-    def apply_transforms(cls, lazy_df: pl.LazyFrame, transforms: list[dict[str, Any]]) -> pl.LazyFrame:
+    def apply_transforms(
+        cls, lazy_df: pl.LazyFrame, transforms: list[dict[str, Any]]
+    ) -> pl.LazyFrame:
         df_plan = lazy_df
 
         for t in transforms:
@@ -50,18 +54,16 @@ class TransformEngine:
                 col_name = t.get("column")
                 delimiter = t.get("delimiter", ",")
                 if col_name:
-                    df_plan = df_plan.with_columns(
-                        pl.col(col_name).cast(pl.Utf8).str.split(delimiter)
-                    ).explode(col_name).with_columns(
-                        pl.col(col_name).str.strip_chars()
+                    df_plan = (
+                        df_plan.with_columns(pl.col(col_name).cast(pl.Utf8).str.split(delimiter))
+                        .explode(col_name)
+                        .with_columns(pl.col(col_name).str.strip_chars())
                     )
 
         return df_plan
 
     @classmethod
     def _apply_formula(cls, lazy_df: pl.LazyFrame, col_name: str, formula: str) -> pl.LazyFrame:
-        import re
-
         tokens = re.split(r"([+\-*/()])", formula)
         expr_parts = []
         schema_cols = lazy_df.collect_schema().names()
@@ -102,7 +104,9 @@ class TransformEngine:
         return lazy_df
 
     @classmethod
-    def _apply_string_transform(cls, lazy_df: pl.LazyFrame, col_name: str, mode: str) -> pl.LazyFrame:
+    def _apply_string_transform(
+        cls, lazy_df: pl.LazyFrame, col_name: str, mode: str
+    ) -> pl.LazyFrame:
         col = pl.col(col_name).cast(pl.Utf8)
         if mode == "trim":
             return lazy_df.with_columns(col.str.strip_chars())

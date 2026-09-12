@@ -1,5 +1,7 @@
 import unittest
+
 import polars as pl
+
 from engine.advisor.semantic_classifier import SemanticClassifier
 
 
@@ -20,7 +22,10 @@ class TestSemanticClassifier(unittest.TestCase):
 
     def test_title_is_classified_as_text_not_identifier(self):
         # title: Movie / show titles with spaces and words (e.g. "Breaking Bad", "The Matrix")
-        title_series = pl.Series("title", ["Breaking Bad", "The Matrix", "Inception", "Stranger Things", "Pulp Fiction"] * 20)
+        title_series = pl.Series(
+            "title",
+            ["Breaking Bad", "The Matrix", "Inception", "Stranger Things", "Pulp Fiction"] * 20,
+        )
         res = SemanticClassifier.classify_column(
             col_name="title",
             dtype_str="String",
@@ -77,7 +82,13 @@ class TestSemanticClassifier(unittest.TestCase):
         self.assertEqual(res["semantic_type"], "Location")
 
     def test_text_classification(self):
-        long_series = pl.Series("description", ["A very long description that spans multiple sentences and represents unstructured free text."] * 50)
+        long_series = pl.Series(
+            "description",
+            [
+                "A very long description that spans multiple sentences and represents unstructured free text."
+            ]
+            * 50,
+        )
         res = SemanticClassifier.classify_column(
             col_name="description",
             dtype_str="String",

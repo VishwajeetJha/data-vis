@@ -1,5 +1,7 @@
 from typing import Any
+
 import polars as pl
+
 from engine.advisor.semantic_classifier import SemanticClassifier
 from engine.ingest.parser_factory import ParserFactory
 
@@ -49,12 +51,7 @@ class InsightsEngine:
 
             # Top 5 most frequent values
             try:
-                top_v = (
-                    df_sample.group_by(col)
-                    .len()
-                    .sort("len", descending=True)
-                    .limit(5)
-                )
+                top_v = df_sample.group_by(col).len().sort("len", descending=True).limit(5)
                 col_meta["top_values"] = [
                     {"value": str(row[0]), "count": int(row[1])}
                     for row in top_v.iter_rows()
@@ -80,9 +77,17 @@ class InsightsEngine:
                 if len(non_null) > 0:
                     col_meta["min"] = float(non_null.min()) if non_null.min() is not None else None
                     col_meta["max"] = float(non_null.max()) if non_null.max() is not None else None
-                    col_meta["mean"] = round(float(non_null.mean()), 2) if non_null.mean() is not None else None
-                    col_meta["median"] = round(float(non_null.median()), 2) if non_null.median() is not None else None
-                    col_meta["std"] = round(float(non_null.std()), 2) if non_null.std() is not None else None
+                    col_meta["mean"] = (
+                        round(float(non_null.mean()), 2) if non_null.mean() is not None else None
+                    )
+                    col_meta["median"] = (
+                        round(float(non_null.median()), 2)
+                        if non_null.median() is not None
+                        else None
+                    )
+                    col_meta["std"] = (
+                        round(float(non_null.std()), 2) if non_null.std() is not None else None
+                    )
 
             col_profiles.append(col_meta)
 
@@ -151,7 +156,6 @@ class InsightsEngine:
                 if len(non_null) > 10:
                     mean_val = float(non_null.mean() or 0)
                     std_val = float(non_null.std() or 0)
-                    min_val = float(non_null.min() or 0)
                     max_val = float(non_null.max() or 0)
 
                     if std_val > 0 and (max_val - mean_val) > 3 * std_val:

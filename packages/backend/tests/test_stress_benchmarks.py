@@ -1,8 +1,8 @@
 import time
-import pytest
+
 import polars as pl
+
 from engine.query.query_compiler import QueryCompiler
-from engine.query.transform_engine import TransformEngine
 
 
 class TestStressAndEdgeBenchmarks:
@@ -13,11 +13,13 @@ class TestStressAndEdgeBenchmarks:
     def test_one_million_row_aggregation_performance(self):
         """Verify 1,000,000 row aggregation compiles and executes in under 100ms."""
         n_rows = 1_000_000
-        df = pl.DataFrame({
-            "category": ["Dept A", "Dept B", "Dept C", "Dept D", "Dept E"] * (n_rows // 5),
-            "amount": [12.5, 45.0, 99.2, 5.1, 78.4] * (n_rows // 5),
-            "score": [1, 2, 3, 4, 5] * (n_rows // 5),
-        })
+        df = pl.DataFrame(
+            {
+                "category": ["Dept A", "Dept B", "Dept C", "Dept D", "Dept E"] * (n_rows // 5),
+                "amount": [12.5, 45.0, 99.2, 5.1, 78.4] * (n_rows // 5),
+                "score": [1, 2, 3, 4, 5] * (n_rows // 5),
+            }
+        )
 
         query_dto = {
             "dataset_id": "test-million-rows",
@@ -40,16 +42,18 @@ class TestStressAndEdgeBenchmarks:
 
     def test_multi_valued_list_dimension_exploding(self):
         """Test on-the-fly exploding of comma-separated multi-valued list dimensions."""
-        df = pl.DataFrame({
-            "title": ["Inception", "Interstellar", "Jurassic Park", "Catch Me If You Can"],
-            "director": [
-                "Christopher Nolan",
-                "Christopher Nolan",
-                "Steven Spielberg",
-                "Steven Spielberg, Christopher Nolan",
-            ],
-            "revenue": [830, 700, 1000, 350],
-        })
+        df = pl.DataFrame(
+            {
+                "title": ["Inception", "Interstellar", "Jurassic Park", "Catch Me If You Can"],
+                "director": [
+                    "Christopher Nolan",
+                    "Christopher Nolan",
+                    "Steven Spielberg",
+                    "Steven Spielberg, Christopher Nolan",
+                ],
+                "revenue": [830, 700, 1000, 350],
+            }
+        )
 
         query_dto = {
             "dataset_id": "test-explode",
@@ -73,10 +77,12 @@ class TestStressAndEdgeBenchmarks:
 
     def test_bidirectional_metric_sorting_invariance(self):
         """Verify sorting by high-to-low and low-to-high across metric aliases."""
-        df = pl.DataFrame({
-            "dept": ["Eng", "Sales", "HR", "Marketing", "Legal"],
-            "salary": [150000, 90000, 75000, 85000, 120000],
-        })
+        df = pl.DataFrame(
+            {
+                "dept": ["Eng", "Sales", "HR", "Marketing", "Legal"],
+                "salary": [150000, 90000, 75000, 85000, 120000],
+            }
+        )
 
         # 1. High to Low
         q_desc = {
@@ -102,15 +108,17 @@ class TestStressAndEdgeBenchmarks:
 
     def test_date_chronological_sorting_invariance(self):
         """Verify dates in various string formats sort chronologically, not lexicographically."""
-        df = pl.DataFrame({
-            "date_added": [
-                "September 25, 2021",
-                "January 1, 2020",
-                "July 15, 2020",
-                "February 3, 2019",
-            ],
-            "views": [100, 500, 300, 200],
-        })
+        df = pl.DataFrame(
+            {
+                "date_added": [
+                    "September 25, 2021",
+                    "January 1, 2020",
+                    "July 15, 2020",
+                    "February 3, 2019",
+                ],
+                "views": [100, 500, 300, 200],
+            }
+        )
 
         # Ascending chronological sort
         q_date = {
@@ -130,10 +138,12 @@ class TestStressAndEdgeBenchmarks:
 
     def test_dirty_dataset_fuzzing(self):
         """Ensure resilient query execution on dirty data with nulls, trailing whitespaces, NaNs."""
-        df = pl.DataFrame({
-            "category": ["  Tech ", None, "Tech", "Finance", "", "Finance "],
-            "value": [10.0, float("nan"), 20.0, None, 5.0, 15.0],
-        })
+        df = pl.DataFrame(
+            {
+                "category": ["  Tech ", None, "Tech", "Finance", "", "Finance "],
+                "value": [10.0, float("nan"), 20.0, None, 5.0, 15.0],
+            }
+        )
 
         query_dto = {
             "dataset_id": "test-dirty",

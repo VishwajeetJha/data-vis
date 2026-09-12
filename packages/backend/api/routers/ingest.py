@@ -159,4 +159,3 @@ async def delete_dataset(dataset_id: str):
             detail={"error": {"code": "DATASET_NOT_FOUND", "message": "Dataset not found"}},
         )
     return {"status": "success", "dataset_id": dataset_id}
-

@@ -1,5 +1,6 @@
 import re
 from typing import Any
+
 import polars as pl
 
 
@@ -73,7 +74,10 @@ class SemanticClassifier:
             }
 
         # String Date Detection (e.g. "September 9, 2019", "1/1/2020", "2020-05-12", date_added)
-        date_name_match = re.search(r"(date_added|added_date|date$|^date|created_at|updated_at|timestamp|dob|release_date|order_date|ship_date)", clean_name)
+        date_name_match = re.search(
+            r"(date_added|added_date|date$|^date|created_at|updated_at|timestamp|dob|release_date|order_date|ship_date)",
+            clean_name,
+        )
         if date_name_match:
             return {
                 "semantic_type": "Date",
@@ -95,8 +99,13 @@ class SemanticClassifier:
                 }
 
         # 3. LIST / MULTI-VALUE (Comma-separated entities like director, cast, genres, tags)
-        is_list_name = re.search(r"(director|cast|genres|listed_in|tags|keywords|actors|crew|categories|authors)", clean_name)
-        if (is_list_name and comma_separated_count > 0) or (sample_size > 5 and comma_separated_count / sample_size > 0.3):
+        is_list_name = re.search(
+            r"(director|cast|genres|listed_in|tags|keywords|actors|crew|categories|authors)",
+            clean_name,
+        )
+        if (is_list_name and comma_separated_count > 0) or (
+            sample_size > 5 and comma_separated_count / sample_size > 0.3
+        ):
             return {
                 "semantic_type": "List",
                 "cardinality": distinct_count,
@@ -107,7 +116,10 @@ class SemanticClassifier:
             }
 
         # 4. TITLES, NAMES & FREE TEXT
-        is_title_or_name = re.search(r"(title|name|movie|film|song|track|author|actor|director|artist|headline|description|comment|text|notes|review|bio|summary|abstract)", clean_name)
+        is_title_or_name = re.search(
+            r"(title|name|movie|film|song|track|author|actor|director|artist|headline|description|comment|text|notes|review|bio|summary|abstract)",
+            clean_name,
+        )
         if is_title_or_name or avg_len > 35 or (has_spaces and distinct_count > 50):
             if distinct_count <= 25 and not is_title_or_name:
                 return {
@@ -127,7 +139,10 @@ class SemanticClassifier:
             }
 
         # 5. IDENTIFIERS (Alphanumeric keys, IDs without spaces)
-        id_pattern = re.search(r"(_id$|^id$|uuid|guid|ssn|employee_id|show_id|customer_id|user_id|order_id|code|sku|key$)", clean_name)
+        id_pattern = re.search(
+            r"(_id$|^id$|uuid|guid|ssn|employee_id|show_id|customer_id|user_id|order_id|code|sku|key$)",
+            clean_name,
+        )
         if id_pattern and (uniqueness_ratio > 0.3 or distinct_count > 100):
             return {
                 "semantic_type": "Identifier",
@@ -138,7 +153,12 @@ class SemanticClassifier:
                 "warning": "High cardinality alphanumeric identifier. Not recommended for chart axes.",
             }
 
-        if uniqueness_ratio >= 0.95 and total_rows > 20 and not has_spaces and not any(t in dtype_lower for t in ["float"]):
+        if (
+            uniqueness_ratio >= 0.95
+            and total_rows > 20
+            and not has_spaces
+            and not any(t in dtype_lower for t in ["float"])
+        ):
             return {
                 "semantic_type": "Identifier",
                 "cardinality": distinct_count,
@@ -149,7 +169,10 @@ class SemanticClassifier:
             }
 
         # 6. LOCATION (Country, State, City, Zip, Lat/Lon)
-        loc_pattern = re.search(r"(country|nation|state|province|city|region|county|zip|postal|latitude|longitude|lat$|lon$|lng$)", clean_name)
+        loc_pattern = re.search(
+            r"(country|nation|state|province|city|region|county|zip|postal|latitude|longitude|lat$|lon$|lng$)",
+            clean_name,
+        )
         if loc_pattern:
             return {
                 "semantic_type": "Location",

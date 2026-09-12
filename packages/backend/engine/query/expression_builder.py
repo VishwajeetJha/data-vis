@@ -1,3 +1,4 @@
+import re
 from typing import Any
 
 import polars as pl
@@ -25,7 +26,6 @@ class ExpressionBuilder:
         elif op in ["lte", "<="]:
             return col <= val
         elif op in ["contains"]:
-            import re
             escaped_val = re.escape(str(val))
             return col.cast(pl.Utf8).str.contains(f"(?i){escaped_val}")
         elif op in ["starts_with"]:

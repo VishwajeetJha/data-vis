@@ -1,4 +1,5 @@
 import unittest
+
 import polars as pl
 
 from engine.ai.insights_engine import InsightsEngine
@@ -13,9 +14,24 @@ class TestAIEngine(unittest.TestCase):
             {"name": "units", "data_type": "Int64"},
         ]
         self.col_profiles = [
-            {"name": "region", "data_type": "String", "semantic_type": "Category", "distinct_count": 4},
-            {"name": "revenue", "data_type": "Float64", "semantic_type": "Numeric", "distinct_count": 100},
-            {"name": "units", "data_type": "Int64", "semantic_type": "Numeric", "distinct_count": 50},
+            {
+                "name": "region",
+                "data_type": "String",
+                "semantic_type": "Category",
+                "distinct_count": 4,
+            },
+            {
+                "name": "revenue",
+                "data_type": "Float64",
+                "semantic_type": "Numeric",
+                "distinct_count": 100,
+            },
+            {
+                "name": "units",
+                "data_type": "Int64",
+                "semantic_type": "Numeric",
+                "distinct_count": 50,
+            },
         ]
 
     def test_nlq_parsing(self):

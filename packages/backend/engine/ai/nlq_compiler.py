@@ -101,13 +101,9 @@ class NLQCompiler:
             ]
         ):
             agg_func = "count"
-        elif any(
-            w in prompt_lower for w in ["max", "maximum", "highest", "top", "peak"]
-        ):
+        elif any(w in prompt_lower for w in ["max", "maximum", "highest", "top", "peak"]):
             agg_func = "max"
-        elif any(
-            w in prompt_lower for w in ["min", "minimum", "lowest", "bottom"]
-        ):
+        elif any(w in prompt_lower for w in ["min", "minimum", "lowest", "bottom"]):
             agg_func = "min"
         elif any(w in prompt_lower for w in ["median"]):
             agg_func = "median"
@@ -118,9 +114,7 @@ class NLQCompiler:
         ungrounded_tokens: list[str] = []
 
         # A. Look for "by [column]" or "across [column]" or "per [column]" pattern
-        by_match = re.search(
-            r"\b(?:by|across|per|grouped by)\s+([a-zA-Z0-9_\s]+)", prompt_lower
-        )
+        by_match = re.search(r"\b(?:by|across|per|grouped by)\s+([a-zA-Z0-9_\s]+)", prompt_lower)
         if by_match:
             by_phrase = by_match.group(1).strip()
             # Clean trailing chart type mentions if any (e.g. "by department as a bar chart")
@@ -135,11 +129,7 @@ class NLQCompiler:
                 target_dim = matched_col
             else:
                 # If specific words inside the by phrase were given
-                phrase_words = [
-                    w
-                    for w in re.findall(r"\w+", by_phrase)
-                    if w not in cls.STOP_WORDS
-                ]
+                phrase_words = [w for w in re.findall(r"\w+", by_phrase) if w not in cls.STOP_WORDS]
                 found_word_match = False
                 for pw in phrase_words:
                     m = cls.fuzzy_match_column(pw, column_names)
@@ -162,9 +152,7 @@ class NLQCompiler:
                 target_metric = matched_metric
             else:
                 phrase_words = [
-                    w
-                    for w in re.findall(r"\w+", metric_phrase)
-                    if w not in cls.STOP_WORDS
+                    w for w in re.findall(r"\w+", metric_phrase) if w not in cls.STOP_WORDS
                 ]
                 found_word_match = False
                 for pw in phrase_words:
@@ -177,9 +165,7 @@ class NLQCompiler:
                     ungrounded_tokens.extend(phrase_words)
 
         # C. Scan all other non-stop words in the prompt for column matches
-        significant_words = [
-            w for w in words if w not in cls.STOP_WORDS and len(w) > 2
-        ]
+        significant_words = [w for w in words if w not in cls.STOP_WORDS and len(w) > 2]
         for w in significant_words:
             matched = cls.fuzzy_match_column(w, column_names)
             if matched:
@@ -188,11 +174,7 @@ class NLQCompiler:
                 data_type = col_meta.get(
                     "data_type",
                     next(
-                        (
-                            c["data_type"]
-                            for c in schema
-                            if c["name"] == matched
-                        ),
+                        (c["data_type"] for c in schema if c["name"] == matched),
                         "",
                     ),
                 )
@@ -223,8 +205,7 @@ class NLQCompiler:
             cat_cols = [
                 c["name"]
                 for c in (col_profiles or [])
-                if c.get("semantic_type")
-                in ["Category", "Date", "Year", "Location"]
+                if c.get("semantic_type") in ["Category", "Date", "Year", "Location"]
             ]
             if cat_cols:
                 target_dim = cat_cols[0]
@@ -232,18 +213,13 @@ class NLQCompiler:
                 string_cols = [
                     c["name"]
                     for c in schema
-                    if any(
-                        t in c["data_type"]
-                        for t in ["String", "Utf8", "Categorical"]
-                    )
+                    if any(t in c["data_type"] for t in ["String", "Utf8", "Categorical"])
                 ]
                 target_dim = string_cols[0] if string_cols else column_names[0]
 
         if not target_metric:
             num_cols = [
-                c["name"]
-                for c in (col_profiles or [])
-                if c.get("semantic_type") == "Numeric"
+                c["name"] for c in (col_profiles or []) if c.get("semantic_type") == "Numeric"
             ]
             if num_cols:
                 target_metric = num_cols[0]
@@ -251,19 +227,12 @@ class NLQCompiler:
                 num_cols_schema = [
                     c["name"]
                     for c in schema
-                    if any(
-                        t in c["data_type"]
-                        for t in ["Int", "Float", "Decimal", "Double"]
-                    )
+                    if any(t in c["data_type"] for t in ["Int", "Float", "Decimal", "Double"])
                 ]
                 target_metric = (
                     num_cols_schema[0]
                     if num_cols_schema
-                    else (
-                        column_names[1]
-                        if len(column_names) > 1
-                        else column_names[0]
-                    )
+                    else (column_names[1] if len(column_names) > 1 else column_names[0])
                 )
 
         # If target metric is non-numeric, switch aggregation to count
@@ -306,31 +275,20 @@ class NLQCompiler:
             chart_type = "line"
             intent = "trend_analysis"
         elif any(
-            w in prompt_lower
-            for w in ["pie", "proportion", "share", "composition", "breakdown"]
+            w in prompt_lower for w in ["pie", "proportion", "share", "composition", "breakdown"]
         ):
             chart_type = "pie"
             intent = "composition"
-        elif any(
-            w in prompt_lower
-            for w in ["scatter", "correlation", "relationship", "vs"]
-        ):
+        elif any(w in prompt_lower for w in ["scatter", "correlation", "relationship", "vs"]):
             chart_type = "scatter"
             intent = "correlation"
-        elif any(
-            w in prompt_lower
-            for w in ["distribution", "histogram", "binned", "frequency"]
-        ):
+        elif any(w in prompt_lower for w in ["distribution", "histogram", "binned", "frequency"]):
             chart_type = "hist"
             intent = "distribution"
-        elif any(
-            w in prompt_lower for w in ["box", "boxplot", "spread", "outliers"]
-        ):
+        elif any(w in prompt_lower for w in ["box", "boxplot", "spread", "outliers"]):
             chart_type = "box"
             intent = "distribution"
-        elif any(
-            w in prompt_lower for w in ["heatmap", "matrix", "cross tab", "crosstab"]
-        ):
+        elif any(w in prompt_lower for w in ["heatmap", "matrix", "cross tab", "crosstab"]):
             chart_type = "heatmap"
             intent = "cross_tabular"
 

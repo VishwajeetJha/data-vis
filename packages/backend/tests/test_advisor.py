@@ -1,6 +1,7 @@
 import os
 import tempfile
 import unittest
+
 from fastapi.testclient import TestClient
 
 from db.connection import init_db
@@ -12,12 +13,42 @@ from main import app
 class TestVisualizationAdvisor(unittest.TestCase):
     def setUp(self):
         self.mock_profiles = [
-            {"name": "show_id", "data_type": "String", "semantic_type": "Identifier", "distinct_count": 8790},
-            {"name": "type", "data_type": "String", "semantic_type": "Category", "distinct_count": 2},
-            {"name": "title", "data_type": "String", "semantic_type": "Text", "distinct_count": 8780},
-            {"name": "release_year", "data_type": "Int64", "semantic_type": "Year", "distinct_count": 70},
-            {"name": "duration_mins", "data_type": "Float64", "semantic_type": "Numeric", "distinct_count": 120},
-            {"name": "director", "data_type": "String", "semantic_type": "List", "distinct_count": 4500},
+            {
+                "name": "show_id",
+                "data_type": "String",
+                "semantic_type": "Identifier",
+                "distinct_count": 8790,
+            },
+            {
+                "name": "type",
+                "data_type": "String",
+                "semantic_type": "Category",
+                "distinct_count": 2,
+            },
+            {
+                "name": "title",
+                "data_type": "String",
+                "semantic_type": "Text",
+                "distinct_count": 8780,
+            },
+            {
+                "name": "release_year",
+                "data_type": "Int64",
+                "semantic_type": "Year",
+                "distinct_count": 70,
+            },
+            {
+                "name": "duration_mins",
+                "data_type": "Float64",
+                "semantic_type": "Numeric",
+                "distinct_count": 120,
+            },
+            {
+                "name": "director",
+                "data_type": "String",
+                "semantic_type": "List",
+                "distinct_count": 4500,
+            },
         ]
 
     def test_tier_2_incompatibility_blocks_sum_on_text(self):
@@ -80,7 +111,9 @@ class TestAdvisorRouter(unittest.IsolatedAsyncioTestCase):
     async def test_advisor_endpoints(self):
         csv_path = os.path.join(self.temp_dir.name, "netflix_sample.csv")
         with open(csv_path, "w", encoding="utf-8") as f:
-            f.write("show_id,type,title,release_year,duration_mins\ns1,Movie,Dick Johnson Is Dead,2020,90\ns2,TV Show,Blood & Water,2021,45\ns3,Movie,Ganglands,2021,80\n")
+            f.write(
+                "show_id,type,title,release_year,duration_mins\ns1,Movie,Dick Johnson Is Dead,2020,90\ns2,TV Show,Blood & Water,2021,45\ns3,Movie,Ganglands,2021,80\n"
+            )
 
         # Ingest file
         ingest_res = self.client.post(

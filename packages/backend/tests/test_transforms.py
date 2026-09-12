@@ -1,6 +1,7 @@
 import os
 import tempfile
 import unittest
+
 from fastapi.testclient import TestClient
 
 from db.connection import init_db
@@ -20,7 +21,9 @@ class TestTransformEngine(unittest.IsolatedAsyncioTestCase):
     async def test_calculated_column_and_impute(self):
         csv_path = os.path.join(self.temp_dir.name, "test_payroll.csv")
         with open(csv_path, "w", encoding="utf-8") as f:
-            f.write("Employee,Salary,Bonus,Score\n  alice smith  ,5000.1234,1000,98.765\nBob,6000,,85.123\nCharlie,7000,2000,90.456\n")
+            f.write(
+                "Employee,Salary,Bonus,Score\n  alice smith  ,5000.1234,1000,98.765\nBob,6000,,85.123\nCharlie,7000,2000,90.456\n"
+            )
 
         # Ingest file
         ingest_res = self.client.post(

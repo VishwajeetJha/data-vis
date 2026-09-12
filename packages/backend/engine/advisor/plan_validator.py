@@ -34,7 +34,9 @@ class PlanValidator:
         if metric_meta and aggregation in ["sum", "mean", "avg", "median", "std", "std_dev"]:
             sem_type = metric_meta.get("semantic_type", "")
             dtype = metric_meta.get("data_type", "")
-            if sem_type in ["Text", "Identifier", "List", "Boolean"] or any(t in dtype.lower() for t in ["str", "utf8"]):
+            if sem_type in ["Text", "Identifier", "List", "Boolean"] or any(
+                t in dtype.lower() for t in ["str", "utf8"]
+            ):
                 return {
                     "is_valid": False,
                     "tier": 2,
@@ -42,8 +44,16 @@ class PlanValidator:
                     "title": "Analytical Incompatibility",
                     "message": f"Cannot calculate {aggregation.upper()} on '{metric_col}' because it is a {sem_type or 'Text'} column.",
                     "suggestions": [
-                        {"action": "change_aggregation", "value": "count", "label": "Use 'Count' aggregation instead"},
-                        {"action": "change_aggregation", "value": "count_distinct", "label": "Use 'Count Distinct' aggregation instead"},
+                        {
+                            "action": "change_aggregation",
+                            "value": "count",
+                            "label": "Use 'Count' aggregation instead",
+                        },
+                        {
+                            "action": "change_aggregation",
+                            "value": "count_distinct",
+                            "label": "Use 'Count Distinct' aggregation instead",
+                        },
                     ],
                 }
 
@@ -58,7 +68,11 @@ class PlanValidator:
                     "title": "Invalid Histogram Target",
                     "message": f"Histograms require continuous numeric intervals, but '{metric_col}' is a {sem_type} column.",
                     "suggestions": [
-                        {"action": "change_chart_type", "value": "bar", "label": "Switch to Bar Chart"},
+                        {
+                            "action": "change_chart_type",
+                            "value": "bar",
+                            "label": "Switch to Bar Chart",
+                        },
                     ],
                 }
 
@@ -72,7 +86,11 @@ class PlanValidator:
                     "title": "Invalid Scatter Dimension",
                     "message": f"Scatter plots explore relationships between continuous measures. '{dimension_col}' is a {dim_meta.get('semantic_type')}.",
                     "suggestions": [
-                        {"action": "change_chart_type", "value": "bar", "label": "Switch to Bar Chart"},
+                        {
+                            "action": "change_chart_type",
+                            "value": "bar",
+                            "label": "Switch to Bar Chart",
+                        },
                     ],
                 }
 
@@ -94,7 +112,10 @@ class PlanValidator:
                     "message": f"'{dimension_col}' contains {distinct_cnt:,} unique categories. Plotting this will create a crowded, unreadable chart.",
                     "suggestions": [
                         {"action": "add_filter", "label": "Filter top categories"},
-                        {"action": "change_dimension", "label": "Choose a lower-cardinality category or date"},
+                        {
+                            "action": "change_dimension",
+                            "label": "Choose a lower-cardinality category or date",
+                        },
                     ],
                 }
 
